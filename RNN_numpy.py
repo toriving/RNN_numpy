@@ -1,10 +1,7 @@
-
 # coding: utf-8
-
 
 import numpy as np
 from datetime import datetime
-
 
 class RNN():
     def __init__(self, word_dim, hidden_dim = 64, bptt_truncate=4):
@@ -17,7 +14,9 @@ class RNN():
         self.U = np.random.uniform(-np.sqrt(1./self.word_dim), np.sqrt(1./self.word_dim), (self.hidden_dim, self.word_dim)) # input weight
         self.V = np.random.uniform(-np.sqrt(1./self.hidden_dim), np.sqrt(1./self.hidden_dim), (self.word_dim, self.hidden_dim)) # output weight
         self.W = np.random.uniform(-np.sqrt(1./self.hidden_dim), np.sqrt(1./self.hidden_dim), (self.hidden_dim, self.hidden_dim)) # hideen state weight
-        
+        self.dh = np.zeros(self.hidden_dim)
+        self.dy = np.zeros(self.word_dim)
+
     def softmax(self, x):
         # softmax function
         a = np.exp(x - np.max(x))
@@ -63,28 +62,34 @@ class RNN():
         dLdU = np.zeros(self.U.shape)
         dLdV = np.zeros(self.V.shape)
         dLdW = np.zeros(self.W.shape)
+        dLdbh = np.zeros(self.dh.shape)
+        dLdby = np.zeros(self.dy.shape)
         delta_o = o
         delta_o[np.arange(len(y)), y] -= 1 # y_hat - y ... y 
         # output back-prop
         for t in np.arange(T):
             dLdV += np.outer(delta_o[t], s[t].T) # shape = word_dim X hidden_dim
+            dLdby += delta_o[t]
             # Error에서 나온 초기 delta
-            delta_t = self.V.T.dot(delta_o[t]) * (1 - (s[t]**2))            
+            delta_t = self.V.T.dot(delta_o[t]) * (1 - (s[t]**2))
             # bptt // 초기 설정한 bptt_truncate 까지
             # t 시간이 주어지면 t-1, t-2, ... 계산
             for bptt_step in np.arange(max(0, t-self.bptt_truncate), t+1)[::-1]:
                 dLdW += np.outer(delta_t, s[bptt_step - 1]) # delta_t를 알고있으면 outer를 이용하여 쉽게 계산할수 있다고...
                 dLdU[:, x[bptt_step]] += delta_t # 더해주기만해도됨.
+                dLdbh += delta_t
                 # 다음 step을 위한 delta 업데이트
                 delta_t = self.W.T.dot(delta_t) * (1 - s[bptt_step - 1]**2)                
-        return [dLdU, dLdV, dLdW]
+        return [dLdU, dLdV, dLdW, dLdbh, dLdby]
 
     def sgd_step(self, x, y, learning_rate=0.01):
-        dLdU, dLdV, dLdW = self.bptt(x,y)
+        dLdU, dLdV, dLdW, dLdbh, dLdby = self.bptt(x,y)
         self.U -= learning_rate * dLdU
         self.V -= learning_rate * dLdV
         self.W -= learning_rate * dLdW
-    
+        self.dh -= learning_rate * dLdbh
+        self.dy -= learning_rate * dLdby
+
     def train(self, x_train, y_train, learning_rate = 0.01, epoch = 100):
         # loss 저장
         losses = []
