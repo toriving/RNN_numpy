@@ -1,0 +1,23 @@
+The number of words : 3507
+2018-08-28 12:34:46: loss after num_examples_seen=0 epoch=0: 8.162929
+2018-08-28 12:37:38: loss after num_examples_seen=5138 epoch=1: 3.694227
+2018-08-28 12:40:43: loss after num_examples_seen=10276 epoch=2: 3.561327
+2018-08-28 12:43:44: loss after num_examples_seen=15414 epoch=3: 3.530802
+2018-08-28 12:46:41: loss after num_examples_seen=20552 epoch=4: 3.472515
+2018-08-28 12:49:37: loss after num_examples_seen=25690 epoch=5: 3.493083
+setting learning rate to 0.005000
+2018-08-28 12:52:34: loss after num_examples_seen=30828 epoch=6: 3.264335
+2018-08-28 12:55:35: loss after num_examples_seen=35966 epoch=7: 3.220204
+2018-08-28 12:58:27: loss after num_examples_seen=41104 epoch=8: 3.185537
+2018-08-28 13:01:21: loss after num_examples_seen=46242 epoch=9: 3.151255
+generation
+a refrigerator hydrant is a skateboard in the living .
+two plates on an empty by tricks on some birds .
+well hot lie in the street next to a emergency .
+a person is riding the beach of a dinner .
+two people men with pink of a white meter .
+the pants is standing the water next to a building tree .
+a person is on a table on a shredded rides .
+a salad in the black is taking a baseball street .
+a white truck signs looking located furniture of grass .
+a few plate out are holding a small case .

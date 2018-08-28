@@ -1,28 +1,33 @@
 import numpy as np
 from RNN_numpy import RNN
+from data_loader import data_loader
 
-a = RNN(6)
+model = RNN(3507) #3507
+loader = data_loader()
+x,y= loader.data_load()
 
-x_train = np.array([[1,2,3,4,5]])
-y_train = np.array([[2,3,4,5,1]])
+x_train, y_train = loader.data_load()
 
-a.train(x_train,y_train, learning_rate=0.01, epoch = 200)
-
-print(a.predict(np.array([2,1,3])))
-print(a.predict(np.array([2,1])))
-
-print(a.predict(np.array([1,2,3,4,5])))
-print(a.predict(np.array([2,3,4,5,1])))
-print(a.predict(np.array([3,4,5,1,2])))
-print(a.predict(np.array([4,5,1,2,3])))
-print(a.predict(np.array([5,1,2,3,4])))
-print(a.predict(np.array([3])))
+model.train(x_train,y_train, learning_rate=0.01, epoch = 1)
 
 
-a1 = a.predict(np.array([1]))
-a2 = a.predict(a1)
-a3 = a.predict(a2)
-a4 = a.predict(a3)
-a5 = a.predict(a4)
-print(a1,a2,a3,a4,a5)
+def generate_sentence(model):
+    new_sentence = [loader.word_to_ix["<START_TOKEN>"]]
+    while not new_sentence[-1] == loader.word_to_ix["<END_TOKEN>"]:
+        next_word_probs = model.forward_propagation(new_sentence)[0]
+        samples = np.random.multinomial(1, next_word_probs[-1])
+        sampled_word = np.argmax(samples)
+        new_sentence.append(sampled_word)
+    new_sentence = loader.transform(np.array(new_sentence))
 
+    return new_sentence
+
+num_sentences = 10
+senten_min_length = 5
+
+print("generation")
+for i in range(num_sentences):
+    sent = []
+    while len(sent) < senten_min_length:
+        sent = generate_sentence(model)
+    print(sent)
